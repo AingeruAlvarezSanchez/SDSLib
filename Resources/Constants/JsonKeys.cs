@@ -18,5 +18,6 @@ public static class JsonKeys {
         Who = "who",
         Lines = "lines",
         Choices = "choices",
-        Next = "next";
+        Next = "next",
+        JsonExtension = ".json";
 }

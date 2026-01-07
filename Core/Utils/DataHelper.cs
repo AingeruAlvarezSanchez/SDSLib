@@ -83,12 +83,13 @@ public static class DataHelper {
     public static void CheckIntegrity<TDependent>(Dictionary<string, IResource> resources,
         string type,
         Func<TDependent, IEnumerable<string>> referenceSelector) where TDependent : IResource {
-        var loaded = resources.Keys.Where(k => k.StartsWith(type + ":", StringComparison.OrdinalIgnoreCase))
+        var loaded = resources.Keys
+            .Where(k => k.StartsWith(type + JsonKeys.Separator, StringComparison.OrdinalIgnoreCase))
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var referenced = resources.Values.OfType<TDependent>()
             .SelectMany(referenceSelector)
-            .Select(id => $"{type}:{id}")
+            .Select(id => $"{type}{JsonKeys.Separator}{id}")
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var missing = referenced.Except(loaded);
