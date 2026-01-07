@@ -12,4 +12,12 @@ public static class DefaultErrors {
     public static string DuplicateKey<T>(string key) {
         return $"Ignoring duplicate key '{key}' loaded in {typeof(T).Name}.";
     }
+
+    public static string MissingParameter<T>(string key) {
+        return $"Missing parameter '{key}' in {typeof(T).Name}.";
+    }
+
+    public static string Unused<T>(string key) {
+        return $"Unused parameter '{key}' of type {typeof(T).Name}.";
+    }
 }

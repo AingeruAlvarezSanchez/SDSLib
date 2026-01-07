@@ -6,7 +6,9 @@ using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDSLib.Core.Constants;
+using SDSLib.Core.Utils;
 using SDSLib.Domain.Interfaces;
+using SDSLib.Domain.Scenes;
 using SDSLib.Resources.Constants;
 using SDSLib.Resources.Loaders;
 
@@ -42,6 +44,12 @@ public class SdsLib : Game {
             );
     }
 
+    private void ValidateResources() {
+        DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Characters, s => s.Characters?.Keys);
+        DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Dialogues, s => s.Dialogues?.Keys);
+        DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Screens, s => s.Screens?.Keys);
+    }
+
     protected override void LoadContent() {
         base.LoadContent();
         _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -69,6 +77,8 @@ public class SdsLib : Game {
 
             loader.Load(Content, v, _resources);
         }
+
+        ValidateResources();
     }
 
     protected override void Update(GameTime gameTime) {
