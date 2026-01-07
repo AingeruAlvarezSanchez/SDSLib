@@ -1,0 +1,6 @@
+﻿# Build results
+bin/
+obj/
+
+# Config files
+.config/
