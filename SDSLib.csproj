@@ -7,4 +7,19 @@
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
     </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Audio\Management\"/>
+        <Folder Include="Audio\Mixers\"/>
+        <Folder Include="Core\Services\"/>
+        <Folder Include="Core\States\"/>
+        <Folder Include="Domain\Entities\"/>
+        <Folder Include="Graphics\Cameras\"/>
+        <Folder Include="Graphics\Effects\"/>
+        <Folder Include="Graphics\Renderers\"/>
+        <Folder Include="Input\Handlers\"/>
+        <Folder Include="Input\Mappings\"/>
+        <Folder Include="UI\Layouts\"/>
+        <Folder Include="UI\Screens\"/>
+        <Folder Include="UI\Widgets\"/>
+    </ItemGroup>
 </Project>
