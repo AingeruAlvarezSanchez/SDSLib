@@ -11,5 +11,7 @@ public static class JsonKeys {
         Screens = "screens",
         When = "when",
         Scenes = "scenes",
-        Priority = "priority";
+        Priority = "priority",
+        DisplayName = "display_name",
+        Textures = "textures";
 }

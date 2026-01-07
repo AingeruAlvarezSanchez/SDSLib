@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDSLib.Core.Constants;
 using SDSLib.Core.Utils;
+using SDSLib.Domain.Characters;
 using SDSLib.Domain.Interfaces;
 using SDSLib.Domain.Scenes;
 using SDSLib.Resources.Constants;
@@ -48,6 +49,9 @@ public class SdsLib : Game {
         DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Characters, s => s.Characters?.Keys);
         DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Dialogues, s => s.Dialogues?.Keys);
         DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Screens, s => s.Screens?.Keys);
+        DataHelper.CheckIntegrity<Character>(
+            _resources, JsonKeys.Dialogues, s => s.Dialogues.Values.Select(v => v.Resource)
+        );
     }
 
     protected override void LoadContent() {

@@ -23,8 +23,11 @@ The library expects resources to be organized in the `{contentRoot}/resources/` 
 
 - `resources.json`: Master file listing all resources to be loaded.
 - `scenes/`: JSON scene definition files.
+- `characters/`: JSON character definition files.
 - `assets/`:
-    - `backgrounds/`: Background images.
+    - `textures/`:
+        - `backgrounds/`: Background images.
+        - `characters/`: Folders named after each character ID containing their textures.
     - `audio/`: Music and effects.
 
 ---
@@ -98,6 +101,55 @@ depending on the game state.
 
 ---
 
+## 👤 Character Definition (`Characters`)
+
+Characters are defined in individual JSON files within `{contentRoot}/resources/characters/`.
+
+### Character Structure
+
+Like scenes, characters use the **Conditional Resource** system for textures, audio, and dialogues.
+
+```json
+{
+  "id": "my_character",
+  "display_name": "My Character",
+  "textures": {
+    "neutral": {
+      "when": [],
+      "priority": 0
+    },
+    "happy": {
+      "when": [
+        "is_happy"
+      ],
+      "priority": 10
+    }
+  },
+  "audio": {
+    "laugh": {
+      "when": [],
+      "priority": 0
+    }
+  },
+  "dialogues": {
+    "intro_lust": {
+      "when": [],
+      "priority": 0
+    }
+  }
+}
+```
+
+### Character Components:
+
+- **`id`**: Unique identifier for the character.
+- **`display_name`**: The name shown in the UI.
+- **`textures`**: Character sprites loaded from `{contentRoot}/resources/assets/textures/characters/{id}/`.
+- **`audio`**: Music or voice lines from `{contentRoot}/resources/assets/audio/`.
+- **`dialogues`**: References to dialogue IDs associated with this character.
+
+---
+
 ## 💎 Conditional Resources (`ConditionalResource`)
 
 Almost every element in SDSLib can be conditional. A conditional object has:
@@ -155,8 +207,8 @@ SDSLib is designed to be easily extensible. To add a new type of resource (e.g.,
 
 SDSLib includes an automatic system that runs on startup:
 
-- **Reference Validation**: If a scene references a character or dialogue not listed in `resources.json`, the game will
-  throw a detailed error indicating what's missing.
+- **Reference Validation**: If a scene references a character or dialogue not listed in `resources.json`, or if a
+  character references a non-existent dialogue, the game will throw a detailed error indicating what's missing.
 - **Orphan Resource Warnings**: The engine will warn you via console if there are loaded resources that no scene is
   using, helping you optimize memory.
 
