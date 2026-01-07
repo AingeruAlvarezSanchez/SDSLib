@@ -13,5 +13,10 @@ public static class JsonKeys {
         Scenes = "scenes",
         Priority = "priority",
         DisplayName = "display_name",
-        Textures = "textures";
+        Textures = "textures",
+        Nodes = "nodes",
+        Who = "who",
+        Lines = "lines",
+        Choices = "choices",
+        Next = "next";
 }

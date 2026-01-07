@@ -97,4 +97,26 @@ public static class DataHelper {
         foreach (var m in missing) throw new Exception(DefaultErrors.NotFound<TDependent>(m));
         foreach (var u in unused) Console.WriteLine(DefaultErrors.Unused<TDependent>(u));
     }
+
+    public static List<List<string>> ToNestedStringList<TOwner>(JsonElement element, string propertyName) {
+        var result = new List<List<string>>();
+        if (!element.TryGetProperty(propertyName, out var arr) || arr.ValueKind != JsonValueKind.Array) return result;
+
+        foreach (var subArr in arr.EnumerateArray()) {
+            if (subArr.ValueKind != JsonValueKind.Array) {
+                Console.WriteLine(DefaultErrors.FailedToRegister<TOwner>(propertyName));
+                continue;
+            }
+
+            var elements = subArr.EnumerateArray()
+                .Select(el => el.GetString() ?? string.Empty)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .ToList();
+            if (elements.Count <= 0) continue;
+
+            result.Add(elements);
+        }
+
+        return result;
+    }
 }

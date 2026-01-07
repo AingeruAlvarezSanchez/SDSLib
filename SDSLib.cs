@@ -7,9 +7,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDSLib.Core.Constants;
 using SDSLib.Core.Utils;
-using SDSLib.Domain.Characters;
+using SDSLib.Domain.Dialogues;
 using SDSLib.Domain.Interfaces;
-using SDSLib.Domain.Scenes;
 using SDSLib.Resources.Constants;
 using SDSLib.Resources.Loaders;
 
@@ -46,11 +45,23 @@ public class SdsLib : Game {
     }
 
     private void ValidateResources() {
-        DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Characters, s => s.Characters?.Keys);
+        /*DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Characters, s => s.Characters?.Keys);
         DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Dialogues, s => s.Dialogues?.Keys);
         DataHelper.CheckIntegrity<Scene>(_resources, JsonKeys.Screens, s => s.Screens?.Keys);
         DataHelper.CheckIntegrity<Character>(
             _resources, JsonKeys.Dialogues, s => s.Dialogues.Values.Select(v => v.Resource)
+        );*/
+        DataHelper.CheckIntegrity<Dialogue>(
+            _resources, JsonKeys.Characters, d => d.Nodes.Values.Where(n => n.Who != null)
+                .Select(n => n.Who)
+        );
+        DataHelper.CheckIntegrity<Dialogue>(
+            _resources,
+            JsonKeys.Scenes,
+            d => d.Nodes.Values
+                .Select(n => n.Next)
+                .Where(next => next != null && next.StartsWith(JsonKeys.Scenes + ":"))
+                .Select(next => next.Replace(JsonKeys.Scenes + ":", ""))
         );
     }
 

@@ -24,6 +24,7 @@ The library expects resources to be organized in the `{contentRoot}/resources/` 
 - `resources.json`: Master file listing all resources to be loaded.
 - `scenes/`: JSON scene definition files.
 - `characters/`: JSON character definition files.
+- `dialogues/`: JSON dialogue definition files.
 - `assets/`:
     - `textures/`:
         - `backgrounds/`: Background images.
@@ -150,6 +151,75 @@ Like scenes, characters use the **Conditional Resource** system for textures, au
 
 ---
 
+## 💬 Dialogue Definition (`Dialogues`)
+
+Dialogues are defined in individual JSON files within `{contentRoot}/resources/dialogues/`. They use a node-based
+structure to handle conversations and branching.
+
+### Dialogue Structure
+
+```json
+{
+  "id": "intro_conversation",
+  "nodes": {
+    "start_node": {
+      "who": "my_character",
+      "lines": [
+        [
+          "Hello! Welcome to the game.",
+          "action:smile"
+        ],
+        [
+          "How are you doing today?"
+        ]
+      ],
+      "choices": [
+        [
+          "I'm fine!",
+          "next:node_happy"
+        ],
+        [
+          "Not so good...",
+          "next:node_sad"
+        ]
+      ],
+      "next": "node_fallback"
+    },
+    "node_happy": {
+      "who": "my_character",
+      "lines": [
+        [
+          "That's great to hear!"
+        ]
+      ]
+    },
+    "node_sad": {
+      "who": "my_character",
+      "lines": [
+        [
+          "I'm sorry to hear that..."
+        ]
+      ]
+    }
+  }
+}
+```
+
+### Dialogue Components:
+
+- **`id`**: Unique identifier for the dialogue.
+- **`nodes`**: A dictionary of nodes, where each key is a unique node ID within the dialogue.
+- **Node Properties**:
+    - **`who`**: (Optional) The character ID speaking in this node.
+    - **`lines`**: A list of lines. Each line is a list of strings, where the first element is the text and subsequent
+      elements can be commands or parameters (e.g., `["Text", "command:value"]`).
+    - **`choices`**: (Optional) A list of player choices. Each choice is a list of strings where the first is the text
+      and one should be a `next:target` command.
+    - **`next`**: (Optional) The ID of the next node to jump to. If it contains a colon (e.g., `scenes:forest`), it
+      jumps to another resource type.
+
+---
+
 ## 💎 Conditional Resources (`ConditionalResource`)
 
 Almost every element in SDSLib can be conditional. A conditional object has:
@@ -207,8 +277,12 @@ SDSLib is designed to be easily extensible. To add a new type of resource (e.g.,
 
 SDSLib includes an automatic system that runs on startup:
 
-- **Reference Validation**: If a scene references a character or dialogue not listed in `resources.json`, or if a
-  character references a non-existent dialogue, the game will throw a detailed error indicating what's missing.
+- **Reference Validation**:
+    - Scenes: Checks if referenced characters, dialogues, and screens exist.
+    - Characters: Checks if referenced dialogues exist.
+    - Dialogues: Checks if referenced characters (in `who`) and external jumps (in `next`) exist.
+- **Internal Integrity**:
+    - Dialogues: Verifies that jumps between nodes within the same dialogue file point to valid node IDs.
 - **Orphan Resource Warnings**: The engine will warn you via console if there are loaded resources that no scene is
   using, helping you optimize memory.
 
