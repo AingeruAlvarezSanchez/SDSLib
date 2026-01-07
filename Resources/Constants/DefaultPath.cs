@@ -5,5 +5,7 @@ public static class DefaultPath {
         ResourcesFile = "resources.json",
         BackgroundsDir = "assets/textures/backgrounds",
         AudioDir = "assets/audio",
-        TexturesDir = "assets/textures/characters";
+        TexturesDir = "assets/textures/characters",
+        FontsDir = "assets/fonts",
+        WidgetsDir = "assets/textures/widgets";
 }

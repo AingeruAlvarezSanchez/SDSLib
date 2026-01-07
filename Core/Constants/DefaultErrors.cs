@@ -20,4 +20,8 @@ public static class DefaultErrors {
     public static string Unused<T>(string key) {
         return $"Unused parameter '{key}' of type {typeof(T).Name}.";
     }
+
+    public static string InvalidType<T>(string key) {
+        return $"Invalid type {typeof(T).Name} for parameter '{key}'.";
+    }
 }

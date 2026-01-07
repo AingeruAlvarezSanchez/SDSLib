@@ -25,11 +25,14 @@ The library expects resources to be organized in the `{contentRoot}/resources/` 
 - `scenes/`: JSON scene definition files.
 - `characters/`: JSON character definition files.
 - `dialogues/`: JSON dialogue definition files.
+- `screens/`: JSON UI screen definition files.
 - `assets/`:
     - `textures/`:
         - `backgrounds/`: Background images.
         - `characters/`: Folders named after each character ID containing their textures.
+      - `widgets/`: Textures used by UI widgets.
     - `audio/`: Music and effects.
+    - `fonts/`: SpriteFont files for UI text.
 
 ---
 
@@ -220,6 +223,89 @@ structure to handle conversations and branching.
 
 ---
 
+## 🖥️ Screen and Widget Definition (`Screens`)
+
+Screens define the UI layout and are stored in `{contentRoot}/resources/screens/`. They consist of textures, fonts, and
+a hierarchy of **Widgets**.
+
+### Screen Structure
+
+```json
+{
+  "id": "default_textbox",
+  "role": "dialogue",
+  "textures": {
+    "textbox_bg": {
+      "when": [],
+      "priority": 0
+    }
+  },
+  "fonts": {
+    "main_font": {
+      "when": [],
+      "priority": 0
+    }
+  },
+  "widgets": [
+    {
+      "id": "dialogue_stack",
+      "type": "stack",
+      "orientation": 118,
+      "spacing": 10,
+      "children": [
+        {
+          "id": "speaker_name",
+          "type": "textbox",
+          "text": "Name",
+          "fonts": [
+            "main_font"
+          ]
+        },
+        {
+          "id": "dialogue_line",
+          "type": "textbox",
+          "text": "...",
+          "fonts": [
+            "main_font"
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Widgets
+
+Widgets are the building blocks of the UI. All widgets share common properties:
+
+- **`id`**: Unique identifier.
+- **`type`**: The kind of widget (`image`, `button`, `stack`, `textbox`).
+- **`anchor`**: (Optional) Alignment within its parent.
+- **`width` / `height`**: Size (relative 0.0 to 1.0).
+- **`children`**: (Optional) A list of nested widgets.
+
+#### Available Widget Types:
+
+| Type          | Specific Properties                   | Description                                                            |
+|:--------------|:--------------------------------------|:-----------------------------------------------------------------------|
+| **`image`**   | `textures`, `action`                  | Displays a texture. `action` is a string identifier.                   |
+| **`button`**  | `textures`, `text`, `fonts`, `action` | A clickable element. `action` must follow the `Class:Method` format.   |
+| **`stack`**   | `orientation`, `spacing`              | Organizes children in a row (`104` for 'h') or column (`118` for 'v'). |
+| **`textbox`** | `textures`, `fonts`, `text`           | Displays text over an optional background.                             |
+
+### Button Actions
+
+Buttons use **Reflection** to trigger code. The `action` property must be a string in the format `ClassName:MethodName`.
+
+- The method must be `public static`.
+- The method must return a `bool`.
+- The method must have no parameters.
+
+Example: `"action": "GameLogic:SaveGame"` will call the static method `SaveGame` in the `GameLogic` class.
+
+---
+
 ## 💎 Conditional Resources (`ConditionalResource`)
 
 Almost every element in SDSLib can be conditional. A conditional object has:
@@ -281,6 +367,8 @@ SDSLib includes an automatic system that runs on startup:
     - Scenes: Checks if referenced characters, dialogues, and screens exist.
     - Characters: Checks if referenced dialogues exist.
     - Dialogues: Checks if referenced characters (in `who`) and external jumps (in `next`) exist.
+  - Screens: Checks if referenced characters or other resources (if applicable) are valid. (Currently mainly validated
+    within scenes).
 - **Internal Integrity**:
     - Dialogues: Verifies that jumps between nodes within the same dialogue file point to valid node IDs.
 - **Orphan Resource Warnings**: The engine will warn you via console if there are loaded resources that no scene is

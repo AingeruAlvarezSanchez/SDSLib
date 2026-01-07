@@ -19,5 +19,22 @@ public static class JsonKeys {
         Lines = "lines",
         Choices = "choices",
         Next = "next",
-        JsonExtension = ".json";
+        JsonExtension = ".json",
+        Fonts = "fonts",
+        Widgets = "widgets",
+        Image = "image",
+        Button = "button",
+        TextBox = "textbox",
+        Stack = "stack",
+        Type = "type",
+        Anchor = "anchor",
+        Action = "action",
+        Text = "text",
+        Orientation = "orientation",
+        Spacing = "spacing",
+        Children = "children",
+        Width = "width",
+        Height = "height",
+        Role = "role",
+        Dialogue = "dialogue";
 }
