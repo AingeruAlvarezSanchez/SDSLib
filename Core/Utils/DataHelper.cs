@@ -120,4 +120,36 @@ public static class DataHelper {
 
         return result;
     }
+
+    public static void CheckDeepIntegrity<TDependent, TResource>(Dictionary<string, IResource> resources,
+        string type,
+        Func<TDependent, string> selector,
+        Func<TResource, string, bool> checker) where TDependent : IResource where TResource : IResource {
+        foreach (var dependent in resources.Values.OfType<TDependent>()) {
+            var path = selector(dependent);
+            if (string.IsNullOrEmpty(path)) continue;
+
+            var parts = path.Split(JsonKeys.Separator);
+            if (parts.Length < 3 || !parts[0]
+                    .Equals(type, StringComparison.OrdinalIgnoreCase))
+                throw new Exception(DefaultErrors.NotFound<TDependent>($"{path}"));
+
+            if (!resources.TryGetValue($"{parts[0]}{JsonKeys.Separator}{parts[1]}", out var res) ||
+                res is not TResource resource || !checker(resource, parts[2]))
+                throw new Exception(
+                    DefaultErrors.NotFound<TDependent>(
+                        $"{parts[0]}{JsonKeys.Separator}{parts[1]}{JsonKeys.Separator}{parts[2]}"
+                    )
+                );
+        }
+    }
+
+    public static bool ContainsChild<T>(IEnumerable<T> collection,
+        string targetId,
+        Func<T, IEnumerable<T>> childSelector) where T : IResource {
+        return collection.Any(item =>
+            item.Id.Equals(targetId, StringComparison.OrdinalIgnoreCase) ||
+            (childSelector(item) != null && ContainsChild(childSelector(item), targetId, childSelector))
+        );
+    }
 }

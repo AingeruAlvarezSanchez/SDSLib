@@ -214,12 +214,53 @@ structure to handle conversations and branching.
 - **`nodes`**: A dictionary of nodes, where each key is a unique node ID within the dialogue.
 - **Node Properties**:
     - **`who`**: (Optional) The character ID speaking in this node.
+  - **`target`**: (Optional) A list of conditional references to UI elements where the text should be displayed.
+    Each target specifies a `screens:screen_id:widget_id`.
     - **`lines`**: A list of lines. Each line is a list of strings, where the first element is the text and subsequent
       elements can be commands or parameters (e.g., `["Text", "command:value"]`).
     - **`choices`**: (Optional) A list of player choices. Each choice is a list of strings where the first is the text
       and one should be a `next:target` command.
     - **`next`**: (Optional) The ID of the next node to jump to. If it contains a colon (e.g., `scenes:forest`), it
       jumps to another resource type.
+
+---
+
+## 🎯 UI Deep Targeting
+
+SDSLib allows you to send dialogue text to specific widgets within any screen. This is done using the `target` property
+in a dialogue node.
+
+### Target Format: `screens:{screen_id}:{widget_id}`
+
+- **`screen_id`**: The ID of the screen resource (as defined in `resources.json`).
+- **`widget_id`**: The unique ID of the widget within that screen's hierarchy.
+
+The engine will recursively search for the widget, meaning it can be a direct child of the screen or nested deeply
+within stacks and other containers.
+
+**Example:**
+
+```json
+{
+  "dialogue_node_01": {
+    "who": "guide_npc",
+    "target": {
+      "screens:info_panel:text_display": {
+        "when": [],
+        "priority": 0
+      }
+    },
+    "lines": [
+      [
+        "Systems online.",
+        "bg:blue_overlay"
+      ]
+    ],
+    "next": "dialogue_node_02"
+  }
+}
+
+```
 
 ---
 
@@ -367,8 +408,8 @@ SDSLib includes an automatic system that runs on startup:
     - Scenes: Checks if referenced characters, dialogues, and screens exist.
     - Characters: Checks if referenced dialogues exist.
     - Dialogues: Checks if referenced characters (in `who`) and external jumps (in `next`) exist.
-  - Screens: Checks if referenced characters or other resources (if applicable) are valid. (Currently mainly validated
-    within scenes).
+- **Deep Targets**: Validates that `target` properties in dialogues point to an existing `Screen` AND that the
+  specific `Widget` exists within that screen's hierarchy.
 - **Internal Integrity**:
     - Dialogues: Verifies that jumps between nodes within the same dialogue file point to valid node IDs.
 - **Orphan Resource Warnings**: The engine will warn you via console if there are loaded resources that no scene is

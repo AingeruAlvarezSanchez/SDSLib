@@ -11,6 +11,7 @@ using SDSLib.Domain.Characters;
 using SDSLib.Domain.Dialogues;
 using SDSLib.Domain.Interfaces;
 using SDSLib.Domain.Scenes;
+using SDSLib.Domain.UI.Screen;
 using SDSLib.Resources.Constants;
 using SDSLib.Resources.Loaders;
 
@@ -65,6 +66,18 @@ public class SdsLib : Game {
                 .Where(next => next != null && next.StartsWith(JsonKeys.Scenes + JsonKeys.Separator))
                 .Select(next => next[(JsonKeys.Scenes.Length + 1)..])
         );
+        foreach (var dialogue in _resources.Values.OfType<Dialogue>()) {
+            foreach (var node in dialogue.Nodes.Values.Where(n => n.Target != null)) {
+                foreach (var target in node.Target) {
+                    DataHelper.CheckDeepIntegrity<Dialogue, Screen>(
+                        _resources,
+                        JsonKeys.Screens,
+                        _ => target.Resource,
+                        (screen, widgetId) => DataHelper.ContainsChild(screen.Widgets.Values, widgetId, w => w.Children)
+                    );
+                }
+            }
+        }
     }
 
     protected override void LoadContent() {

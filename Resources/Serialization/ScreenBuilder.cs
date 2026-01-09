@@ -22,11 +22,9 @@ public abstract class ScreenBuilder : IBuilder<Screen> {
             }
         }
 
-        root.TryGetProperty(JsonKeys.Role, out var role);
         return new Screen(
             DataHelper.GetProperty<string, Screen>(root, JsonKeys.Id, e => e.GetString()),
             JsonKeys.Screens,
-            role.ValueKind == JsonValueKind.String ? role.GetString() : JsonKeys.Dialogue,
             DataHelper.ToConditionalDictionary<Texture2D, ScreenBuilder>(
                 content, root, JsonKeys.Textures, DefaultPath.WidgetsDir
             ),

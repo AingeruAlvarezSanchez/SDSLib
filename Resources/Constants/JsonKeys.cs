@@ -35,6 +35,5 @@ public static class JsonKeys {
         Children = "children",
         Width = "width",
         Height = "height",
-        Role = "role",
-        Dialogue = "dialogue";
+        Target = "target";
 }
