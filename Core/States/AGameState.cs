@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using SDSLib.Core.Constants;
 using SDSLib.Core.Services;
 using SDSLib.Domain.Interfaces;
@@ -26,6 +27,7 @@ public abstract class AGameState : IGameState {
     public virtual void Draw(GameTime gameTime, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch) { }
 
     public virtual void Exit() {
+        if (MediaPlayer.State != MediaState.Stopped) MediaPlayer.Stop();
         if (CurrentScene == null) return;
         GameStatus.SetFlag($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.NotFirstTime}");
         GameStatus.UnSetFlag($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.FirstTime}");

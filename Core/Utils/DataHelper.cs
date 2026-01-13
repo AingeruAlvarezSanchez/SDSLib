@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using Microsoft.Xna.Framework.Content;
 using SDSLib.Core.Constants;
+using SDSLib.Core.Services;
 using SDSLib.Domain.Interfaces;
 using SDSLib.Domain.Resources;
 using SDSLib.Resources.Constants;
@@ -151,5 +152,14 @@ public static class DataHelper {
             item.Id.Equals(targetId, StringComparison.OrdinalIgnoreCase) ||
             (childSelector(item) != null && ContainsChild(childSelector(item), targetId, childSelector))
         );
+    }
+
+    public static T SelectBestResource<T>(Dictionary<string, ConditionalResource<T>> resources) {
+        if (resources.Count == 0) return default;
+        var resource = resources.Values.Where(res => res.Conditions.All(GameStatus.IsFlagActive))
+            .OrderByDescending(res => res.Conditions.Count)
+            .ThenByDescending(res => res.Priority)
+            .FirstOrDefault();
+        return resource != null ? resource.Resource : default;
     }
 }
