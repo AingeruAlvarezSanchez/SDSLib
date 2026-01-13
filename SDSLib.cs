@@ -6,6 +6,7 @@ using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDSLib.Core.Constants;
+using SDSLib.Core.States;
 using SDSLib.Core.Utils;
 using SDSLib.Domain.Characters;
 using SDSLib.Domain.Dialogues;
@@ -18,16 +19,20 @@ using SDSLib.Resources.Loaders;
 namespace SDSLib;
 
 public class SdsLib : Game {
+    private readonly IGameState _entryPoint;
+    private readonly StateManager _stateManager;
     private GraphicsDeviceManager _graphics;
     private Dictionary<string, IResource> _resources;
     private SpriteBatch _spriteBatch;
 
-    protected SdsLib(string gameTitle, string contentRoot) {
+    protected SdsLib(string gameTitle, string contentRoot, IGameState entryPoint) {
         _graphics = new GraphicsDeviceManager(this);
         Window.Title = gameTitle;
         Content.RootDirectory = contentRoot;
         IsMouseVisible = true;
         SdsInstance = this;
+        _stateManager = new StateManager();
+        _entryPoint = entryPoint;
     }
 
     public static SdsLib SdsInstance { get; private set; }
@@ -109,14 +114,19 @@ public class SdsLib : Game {
         }
 
         ValidateResources();
+        _stateManager.ChangeState(_entryPoint);
     }
 
     protected override void Update(GameTime gameTime) {
+        _stateManager.Update(gameTime);
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime) {
         GraphicsDevice.Clear(Color.Black);
+        _spriteBatch.Begin();
+        _stateManager.Draw(gameTime, GraphicsDevice, _spriteBatch);
         base.Draw(gameTime);
+        _spriteBatch.End();
     }
 }

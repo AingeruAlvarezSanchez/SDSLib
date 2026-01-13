@@ -8,14 +8,31 @@ without the need to recompile code.
 
 ### Initialization
 
-To use the library, your main class must inherit from `SdsLib`. You only need to pass the game title and the content
-root folder.
+To use the library, your main class must inherit from `SdsLib`. You only need to pass the game title, the content
+root folder, and an entry point state.
 
 ```csharp
 public class MyGame : SdsLib {
-    public MyGame() : base("My Great Adventure", "Content") { }
+    public MyGame() : base("My Great Adventure", "Content", new NarrativeState("intro_scene")) { }
 }
 ```
+
+### State Management
+
+SDSLib uses a **State Pattern** to manage different game phases (e.g., Main Menu, Narrative, Management, Minigames).
+
+#### Game States (`IGameState`)
+
+All states must implement the `IGameState` interface or inherit from `AGameState`:
+
+- **`Enter(SdsLib instance)`**: Called when the state becomes active.
+- **`Update(GameTime gameTime)`**: Logic update loop.
+- **`Draw(GameTime gameTime, ...)`**: Rendering loop.
+- **`Exit()`**: Cleanup before switching to a new state.
+
+#### StateManager
+
+The `StateManager` handles the transitions between states.
 
 ### File Structure
 
