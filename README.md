@@ -58,6 +58,41 @@ about the current frame:
 - **`GameTime`**: Access to MonoGame's timing information.
 - **`CurrentScene`**: A reference to the active `Scene` resource.
 
+### Game Handlers
+
+SDSLib uses a modular system called **Game Handlers** to manage specific logic within a state. Instead of putting all
+the
+logic in `AGameState`, the engine delegates tasks (like rendering characters, or handling UI) to
+specialized handlers.
+
+#### Lifecycle & Integration
+
+Handlers follow a lifecycle similar to states:
+
+- **`Enter(Scene currentScene)`**: Triggered when a state starts.
+- **`Update(FrameContext context)`**: Logic update.
+- **`Draw(SpriteBatch spriteBatch)`**: Rendering.
+- **`Exit()`**: Cleanup.
+
+#### Automatic Registration
+
+The engine automatically discovers and registers any class that inherits from `AGameHandler` using reflection. This
+means
+you only need to create a new class, and it will be integrated into the game loop:
+
+```csharp
+public class MyCustomHandler : AGameHandler {
+    public MyCustomHandler(SdsLib instance) : base(instance) { }
+
+    public override string Id => "my_custom_handler";
+    public override int Priority => 10; // Handlers are executed in order of priority.
+
+    public override void Enter(Scene currentScene) {
+        // Initialization logic
+    }
+}
+```
+
 ---
 
 ### File Structure
