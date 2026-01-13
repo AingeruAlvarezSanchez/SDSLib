@@ -34,6 +34,32 @@ All states must implement the `IGameState` interface or inherit from `AGameState
 
 The `StateManager` handles the transitions between states.
 
+### Persistence & Game Status
+
+SDSLib includes a global `GameStatus` service to manage game flags and state persistence. This system is used by the
+engine to track progress and can be used by developers to handle conditional logic.
+
+- **`IsFlagActive(string flag)`**: Checks if a specific flag is set.
+- **`SetFlag(string flag)`**: Activates a flag.
+- **`UnSetFlag(string flag)`**: Deactivates a flag.
+
+#### Automatic Flags
+
+The engine automatically manages some flags related to scene navigation:
+
+- `{scene_id}:first_time`: Set when a scene is entered for the first time.
+- `{scene_id}:not_first_time`: Set after a scene has been visited at least once.
+
+### Frame Context
+
+Each state has access to a `FrameContext` object during its `Update` cycle. This object provides essential information
+about the current frame:
+
+- **`GameTime`**: Access to MonoGame's timing information.
+- **`CurrentScene`**: A reference to the active `Scene` resource.
+
+---
+
 ### File Structure
 
 The library expects resources to be organized in the `{contentRoot}/resources/` folder:

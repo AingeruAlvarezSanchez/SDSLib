@@ -41,6 +41,13 @@ public class SdsLib : Game {
         base.Initialize();
     }
 
+    public T GetResource<T>(string id) where T : IResource {
+        if (_resources.TryGetValue(id, out var res) && res is not T)
+            throw new Exception(DefaultErrors.InvalidType<T>(id));
+
+        return (T)_resources[id];
+    }
+
     private static Dictionary<string, IResourceLoader> RegisterResourceLoaders() {
         return typeof(SdsLib).Assembly.GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && typeof(IResourceLoader).IsAssignableFrom(t))
