@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using SDSLib.Core.Utils;
 using SDSLib.Domain.Scenes;
@@ -35,8 +34,6 @@ public sealed class NarrativeState(string sceneId) : AGameState {
         base.Update(gameTime);
         PlayBestSong();
     }
-
-    public override void Draw(GameTime gameTime, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch) { }
 
     public override void Exit() {
         base.Exit();

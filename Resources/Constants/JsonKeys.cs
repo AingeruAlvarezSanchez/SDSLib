@@ -3,6 +3,9 @@
 public static class JsonKeys {
     public const char Separator = ':';
 
+    public const char Vertical = 'v',
+        Horizontal = 'h';
+
     public const string Id = "id",
         Backgrounds = "backgrounds",
         Audio = "audio",
@@ -35,5 +38,13 @@ public static class JsonKeys {
         Children = "children",
         Width = "width",
         Height = "height",
-        Target = "target";
+        Target = "target",
+        TopCenter = "top:center",
+        TopRight = "top:right",
+        TopLeft = "top:left",
+        CenterRight = "center:right",
+        CenterLeft = "center:left",
+        BottomCenter = "bottom:center",
+        BottomRight = "bottom:right",
+        BottomLeft = "bottom:left";
 }

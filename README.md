@@ -294,12 +294,14 @@ structure to handle conversations and branching.
     - **`who`**: (Optional) The character ID speaking in this node.
   - **`target`**: (Optional) A list of conditional references to UI elements where the text should be displayed.
     Each target specifies a `screens:screen_id:widget_id`.
-    - **`lines`**: A list of lines. Each line is a list of strings, where the first element is the text and subsequent
-      elements can be commands or parameters (e.g., `["Text", "command:value"]`).
-    - **`choices`**: (Optional) A list of player choices. Each choice is a list of strings where the first is the text
-      and one should be a `next:target` command.
-    - **`next`**: (Optional) The ID of the next node to jump to. If it contains a colon (e.g., `scenes:forest`), it
-      jumps to another resource type.
+      - **`lines`**: A list of lines. Each line is a list of strings, where the first element is the text and
+        subsequent
+        elements can be commands or parameters (e.g., `["Text", "command:value"]`).
+      - **`choices`**: (Optional) A list of player choices. Each choice is a list of strings where the first is the
+        text
+        and one should be a `next:target` command.
+      - **`next`**: (Optional) The ID of the next node to jump to. If it contains a colon (e.g., `scenes:forest`), it
+        jumps to another resource type.
 
 ---
 
@@ -406,12 +408,29 @@ Widgets are the building blocks of the UI. All widgets share common properties:
 
 #### Available Widget Types:
 
-| Type          | Specific Properties                   | Description                                                            |
-|:--------------|:--------------------------------------|:-----------------------------------------------------------------------|
-| **`image`**   | `textures`, `action`                  | Displays a texture. `action` is a string identifier.                   |
-| **`button`**  | `textures`, `text`, `fonts`, `action` | A clickable element. `action` must follow the `Class:Method` format.   |
-| **`stack`**   | `orientation`, `spacing`              | Organizes children in a row (`104` for 'h') or column (`118` for 'v'). |
-| **`textbox`** | `textures`, `fonts`, `text`           | Displays text over an optional background.                             |
+| Type          | Specific Properties                   | Description                                                                                                                    |
+|:--------------|:--------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
+| **`image`**   | `textures`, `action`                  | Displays a texture. `action` is a string identifier.                                                                           |
+| **`button`**  | `textures`, `text`, `fonts`, `action` | A clickable element. `action` must follow the `Class:Method` format.                                                           |
+| **`stack`**   | `orientation`, `spacing`              | Organizes children in a row (`h`) or column (`v`). `spacing` is relative (0.0 to 1.0) and children are centered automatically. |
+| **`textbox`** | `textures`, `fonts`, `text`           | Displays text over an optional background.                                                                                     |
+
+### Widget Anchoring
+
+The `anchor` property allows positioning a widget relative to its parent container using percentage-based calculations.
+Supported anchors include:
+
+- **Top**: `top:left`, `top:center`, `top:right`
+- **Center**: `center:left`, `center` (default), `center:right`
+- **Bottom**: `bottom:left`, `bottom:center`, `bottom:right`
+
+### Screen Rendering
+
+The `ScreenHandler` manages the visual lifecycle of screens:
+
+- **Backgrounds**: Automatically selected and rendered to fill the screen.
+- **Recursion**: Widgets are processed recursively, creating nested coordinate systems.
+- **Pixel Perfection**: Uses `SamplerState.PointClamp` and coordinate rounding to prevent blurring and unwanted gaps.
 
 ### Button Actions
 

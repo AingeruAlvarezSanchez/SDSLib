@@ -24,23 +24,17 @@ public abstract class AGameState : IGameState {
         _handlers = RegisterResourceHandlers(sdsInstance)
             .OrderBy(h => h.Priority)
             .ToList();
-        foreach (var handler in _handlers) {
-            handler.Enter(CurrentScene);
-        }
+        foreach (var handler in _handlers) handler.Enter(CurrentScene);
     }
 
     public virtual void Update(GameTime gameTime) {
         FrameContext.GameTime = gameTime;
         FrameContext.CurrentScene = CurrentScene;
-        foreach (var handler in _handlers) {
-            handler.Update(FrameContext);
-        }
+        foreach (var handler in _handlers) handler.Update(FrameContext);
     }
 
     public virtual void Draw(GameTime gameTime, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch) {
-        foreach (var handler in _handlers) {
-            handler.Draw(spriteBatch);
-        }
+        foreach (var handler in _handlers) handler.Draw(spriteBatch);
     }
 
     public virtual void Exit() {
@@ -49,9 +43,7 @@ public abstract class AGameState : IGameState {
         GameStatus.SetFlag($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.NotFirstTime}");
         GameStatus.UnSetFlag($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.FirstTime}");
         CurrentScene = null;
-        foreach (var handler in _handlers) {
-            handler.Exit();
-        }
+        foreach (var handler in _handlers) handler.Exit();
 
         _handlers = null;
     }

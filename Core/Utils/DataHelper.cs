@@ -136,12 +136,13 @@ public static class DataHelper {
                 throw new Exception(DefaultErrors.NotFound<TDependent>($"{path}"));
 
             if (!resources.TryGetValue($"{parts[0]}{JsonKeys.Separator}{parts[1]}", out var res) ||
-                res is not TResource resource || !checker(resource, parts[2]))
+                res is not TResource resource || !checker(resource, parts[2])) {
                 throw new Exception(
                     DefaultErrors.NotFound<TDependent>(
                         $"{parts[0]}{JsonKeys.Separator}{parts[1]}{JsonKeys.Separator}{parts[2]}"
                     )
                 );
+            }
         }
     }
 
@@ -161,5 +162,15 @@ public static class DataHelper {
             .ThenByDescending(res => res.Priority)
             .FirstOrDefault();
         return resource != null ? resource.Resource : default;
+    }
+
+    public static List<T> SelectResources<T>(Dictionary<string, ConditionalResource<T>> resources) {
+        if (resources == null || resources.Count == 0) return [];
+
+        return resources.Values
+            .Where(res => res.Conditions.All(GameStatus.IsFlagActive))
+            .OrderByDescending(res => res.Priority)
+            .Select(res => res.Resource)
+            .ToList();
     }
 }

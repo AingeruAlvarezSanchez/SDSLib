@@ -148,8 +148,10 @@ public abstract class WidgetBuilder {
             anchor.ValueKind == JsonValueKind.String ? anchor.GetString() : string.Empty,
             width.ValueKind == JsonValueKind.Number ? width.GetSingle() : 1f,
             height.ValueKind == JsonValueKind.Number ? height.GetSingle() : 1f,
-            orientation.ValueKind == JsonValueKind.Number ? (char)orientation.GetByte() : 'h',
-            spacing.ValueKind == JsonValueKind.Number ? spacing.GetInt32() : 0,
+            orientation.ValueKind == JsonValueKind.String
+                ? (orientation.GetString() ?? string.Empty).FirstOrDefault()
+                : JsonKeys.Horizontal,
+            spacing.ValueKind == JsonValueKind.Number ? spacing.GetSingle() : 0,
             childrenWidgets
         );
     }
