@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Media;
+using SDSLib.Core.Services;
 using SDSLib.Core.Utils;
 using SDSLib.Domain.Scenes;
+using SDSLib.Domain.UI.Screen;
 using SDSLib.Resources.Constants;
 
 namespace SDSLib.Core.States;
@@ -10,6 +14,13 @@ namespace SDSLib.Core.States;
 public sealed class NarrativeState(string sceneId) : AGameState {
     private string _currentSong;
     protected override Scene CurrentScene { get; set; }
+
+    protected override Dictionary<string, Screen> ActiveScreens {
+        get {
+            var handler = _handlers?.FirstOrDefault(h => h is ScreenHandler) as ScreenHandler;
+            return handler?.ActiveScreens;
+        }
+    }
 
     private void PlayBestSong() {
         var song = DataHelper.SelectBestResource(CurrentScene.Sounds);

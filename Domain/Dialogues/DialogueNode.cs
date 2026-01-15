@@ -6,6 +6,6 @@ namespace SDSLib.Domain.Dialogues;
 public sealed record DialogueNode(
     List<List<string>> Lines,
     string Who = null,
-    List<ConditionalResource<string>> Target = null,
+    Dictionary<string, ConditionalResource<string>> Target = null,
     List<List<string>> Choices = null,
     string Next = null);

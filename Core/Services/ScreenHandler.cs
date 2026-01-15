@@ -14,9 +14,9 @@ namespace SDSLib.Core.Services;
 
 public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibInstance) {
     private readonly List<RenderItem> _toDraw = [];
-    public override int Priority => 1;
-
+    public override int Priority => 50;
     public override string Id => nameof(ScreenHandler);
+    public Dictionary<string, Screen> ActiveScreens { get; } = new();
 
     public override void Enter(Scene currentScene) { }
 
@@ -57,9 +57,9 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
                 ProcessWidget(child, bounds, screen);
                 pos += (int)(bounds.Height * child.Height) + spacing;
             }
-        } else
-            foreach (var child in widget.Children)
-                ProcessWidget(child, bounds, screen);
+        } else {
+            foreach (var child in widget.Children) ProcessWidget(child, bounds, screen);
+        }
     }
 
     private void RefreshLayout(Scene currentScene) {
@@ -70,6 +70,7 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
         var activeScreens = DataHelper.SelectResources(currentScene.Screens);
         foreach (var screenId in activeScreens) {
             var screen = SdsLibInstance.GetResource<Screen>($"{JsonKeys.Screens}{JsonKeys.Separator}{screenId}");
+            ActiveScreens[screenId] = screen;
             foreach (var widget in screen.Widgets.Values)
                 ProcessWidget(widget, SdsLibInstance.GraphicsDevice.Viewport.Bounds, screen);
         }
@@ -91,6 +92,7 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
     }
 
     public override void Exit() {
+        ActiveScreens.Clear();
         _toDraw.Clear();
     }
 

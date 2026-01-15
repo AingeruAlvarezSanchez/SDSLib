@@ -26,8 +26,7 @@ public abstract class DialogueBuilder : IBuilder<Dialogue> {
                 node.Name, new DialogueNode(
                     DataHelper.ToNestedStringList<Dialogue>(nodeData, JsonKeys.Lines),
                     nodeData.TryGetProperty(JsonKeys.Who, out var who) ? who.GetString() : null,
-                    DataHelper.ToReferenceDictionary<Dialogue>(nodeData, JsonKeys.Target)
-                        .Values.ToList(),
+                    DataHelper.ToReferenceDictionary<Dialogue>(nodeData, JsonKeys.Target),
                     DataHelper.ToNestedStringList<Dialogue>(nodeData, JsonKeys.Choices),
                     nodeData.TryGetProperty(JsonKeys.Next, out var next) ? next.GetString() : null
                 )

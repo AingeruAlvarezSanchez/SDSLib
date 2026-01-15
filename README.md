@@ -36,19 +36,23 @@ The `StateManager` handles the transitions between states.
 
 ### Persistence & Game Status
 
-SDSLib includes a global `GameStatus` service to manage game flags and state persistence. This system is used by the
+SDSLib includes a global `GameStatus` service to manage game flags, state persistence, and input tracking. This system
+is used by the
 engine to track progress and can be used by developers to handle conditional logic.
 
 - **`IsFlagActive(string flag)`**: Checks if a specific flag is set.
 - **`SetFlag(string flag)`**: Activates a flag.
 - **`UnSetFlag(string flag)`**: Deactivates a flag.
+- **`JustPressedKeyboardInputs`**: List of keys pressed in the current frame.
+- **`JustPressedLeftMouse`**: Boolean indicating if the left mouse button was just pressed.
 
 #### Automatic Flags
 
-The engine automatically manages some flags related to scene navigation:
+The engine automatically manages some flags related to scene navigation and dialogue state:
 
 - `{scene_id}:first_time`: Set when a scene is entered for the first time.
 - `{scene_id}:not_first_time`: Set after a scene has been visited at least once.
+- `dialogues:is_playing`: Set when a dialogue sequence is active.
 
 ### Frame Context
 
@@ -57,6 +61,7 @@ about the current frame:
 
 - **`GameTime`**: Access to MonoGame's timing information.
 - **`CurrentScene`**: A reference to the active `Scene` resource.
+- **`ActiveScreens`**: A dictionary of currently active `Screen` objects.
 
 ### Game Handlers
 
@@ -292,16 +297,14 @@ structure to handle conversations and branching.
 - **`nodes`**: A dictionary of nodes, where each key is a unique node ID within the dialogue.
 - **Node Properties**:
     - **`who`**: (Optional) The character ID speaking in this node.
-  - **`target`**: (Optional) A list of conditional references to UI elements where the text should be displayed.
+  - **`target`**: (Optional) A dictionary of conditional references to UI elements where the text should be displayed.
     Each target specifies a `screens:screen_id:widget_id`.
-      - **`lines`**: A list of lines. Each line is a list of strings, where the first element is the text and
-        subsequent
-        elements can be commands or parameters (e.g., `["Text", "command:value"]`).
-      - **`choices`**: (Optional) A list of player choices. Each choice is a list of strings where the first is the
-        text
-        and one should be a `next:target` command.
-      - **`next`**: (Optional) The ID of the next node to jump to. If it contains a colon (e.g., `scenes:forest`), it
-        jumps to another resource type.
+  - **`lines`**: A list of lines. Each line is a list of strings, where the first element is the text and
+    subsequent elements can be commands or parameters (e.g., `["Text", "command:value"]`).
+  - **`choices`**: (Optional) A list of player choices. Each choice is a list of strings where the first is the
+    text and one should be a `next:target` command.
+  - **`next`**: (Optional) The ID of the next node to jump to. If it contains a colon (e.g., `scenes:forest`), it
+    jumps to another resource type.
 
 ---
 
@@ -441,6 +444,15 @@ Buttons use **Reflection** to trigger code. The `action` property must be a stri
 - The method must have no parameters.
 
 Example: `"action": "GameLogic:SaveGame"` will call the static method `SaveGame` in the `GameLogic` class.
+
+### Dialogue Handler
+
+The `DialogueHandler` manages the progression of conversations:
+
+- **Typewriter Effect**: Supports progressive text display with word-wrapping.
+- **Node-based Navigation**: Handles jumping between nodes and scenes based on player input (Space or Left Mouse).
+- **Conditional Targeting**: Resolves the best UI container for each node based on the `target` configuration and active
+  game flags.
 
 ---
 

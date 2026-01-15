@@ -6,6 +6,7 @@ using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDSLib.Core.Constants;
+using SDSLib.Core.Services;
 using SDSLib.Core.States;
 using SDSLib.Core.Utils;
 using SDSLib.Domain.Characters;
@@ -84,7 +85,7 @@ public class SdsLib : Game {
                     DataHelper.CheckDeepIntegrity<Dialogue, Screen>(
                         _resources,
                         JsonKeys.Screens,
-                        _ => target.Resource,
+                        _ => target.Value.Resource,
                         (screen, widgetId) => DataHelper.ContainsChild(screen.Widgets.Values, widgetId, w => w.Children)
                     );
                 }
@@ -125,6 +126,7 @@ public class SdsLib : Game {
     }
 
     protected override void Update(GameTime gameTime) {
+        GameStatus.UpdateInputs();
         _stateManager.Update(gameTime);
         base.Update(gameTime);
     }

@@ -8,13 +8,15 @@ using SDSLib.Core.Constants;
 using SDSLib.Core.Services;
 using SDSLib.Domain.Interfaces;
 using SDSLib.Domain.Scenes;
+using SDSLib.Domain.UI.Screen;
 using SDSLib.Resources.Constants;
 
 namespace SDSLib.Core.States;
 
 public abstract class AGameState : IGameState {
-    private List<IGameHandler> _handlers;
+    protected List<IGameHandler> _handlers;
     protected virtual Scene CurrentScene { get; set; }
+    protected virtual Dictionary<string, Screen> ActiveScreens { get; } = new();
     public FrameContext FrameContext { get; set; } = new();
 
     public virtual void Enter(SdsLib sdsInstance) {
@@ -30,6 +32,7 @@ public abstract class AGameState : IGameState {
     public virtual void Update(GameTime gameTime) {
         FrameContext.GameTime = gameTime;
         FrameContext.CurrentScene = CurrentScene;
+        FrameContext.ActiveScreens = ActiveScreens;
         foreach (var handler in _handlers) handler.Update(FrameContext);
     }
 
