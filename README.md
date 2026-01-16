@@ -407,6 +407,8 @@ Widgets are the building blocks of the UI. All widgets share common properties:
 - **`type`**: The kind of widget (`image`, `button`, `stack`, `textbox`).
 - **`anchor`**: (Optional) Alignment within its parent.
 - **`width` / `height`**: Size (relative 0.0 to 1.0).
+- **`layout`**: (Internal) Stores the calculated position and scale. Must have a `set` accessor to allow the engine to
+  update it during layout cycles.
 - **`children`**: (Optional) A list of nested widgets.
 
 #### Available Widget Types:
@@ -453,6 +455,8 @@ The `DialogueHandler` manages the progression of conversations:
 - **Node-based Navigation**: Handles jumping between nodes and scenes based on player input (Space or Left Mouse).
 - **Conditional Targeting**: Resolves the best UI container for each node based on the `target` configuration and active
   game flags.
+- **Unified Rendering**: Uses the `Writer` utility to manage multiple text elements (dialogue and choices) in a single
+  dictionary, using the `"main"` key for the primary typewriter text.
 
 ---
 

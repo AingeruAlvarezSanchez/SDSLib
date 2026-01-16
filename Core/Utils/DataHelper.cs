@@ -173,4 +173,17 @@ public static class DataHelper {
             .Select(res => res.Resource)
             .ToList();
     }
+
+    public static T SelectBestResourceWithContext<T>(Dictionary<string, ConditionalResource<T>> resources,
+        List<string> contextCommands) {
+        if (resources is { Count: 0 }) return default;
+
+        var resource = resources.Values
+            .Where(res => res.Conditions.All(c => contextCommands.Contains(c, StringComparer.OrdinalIgnoreCase)))
+            .OrderByDescending(res => res.Conditions.Count)
+            .ThenByDescending(res => res.Priority)
+            .FirstOrDefault();
+
+        return resource != null ? resource.Resource : default;
+    }
 }

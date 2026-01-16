@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SDSLib.Core.Utils.UI;
 using SDSLib.Domain.Interfaces;
 using SDSLib.Resources.Constants;
 
@@ -12,4 +13,7 @@ public sealed record Stack(
     float Height = 1f,
     char Orientation = JsonKeys.Horizontal,
     float Spacing = 0,
-    List<IWidget> Children = null) : IWidget;
+    List<IWidget> Children = null,
+    UiUtils.Layout Layout = default) : IWidget {
+    public UiUtils.Layout Layout { get; set; } = Layout;
+}

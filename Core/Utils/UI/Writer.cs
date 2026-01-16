@@ -1,15 +1,17 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SDSLib.Resources.Constants;
 
 namespace SDSLib.Core.Utils.UI;
 
-public sealed class TypewriterEffect {
+public sealed class Writer {
+    private readonly Dictionary<string, (string Text, Vector2 Position)> _visibleText = new();
     private int _index;
     private string _processedText = string.Empty;
     private double _timer;
     public bool IsFinished;
-    private string VisibleText { get; set; } = string.Empty;
 
     private static string WrapText(SpriteFont font, string text, float maxWidth) {
         if (string.IsNullOrWhiteSpace(text)) return string.Empty;
@@ -30,7 +32,19 @@ public sealed class TypewriterEffect {
             .TrimEnd();
     }
 
-    public void Update(GameTime gameTime, SpriteFont font, string text, double speed, float maxWidth) {
+
+    public void Update(string key, SpriteFont font, string text, float maxWidth, Vector2 position) {
+        var processed = WrapText(font, text, maxWidth);
+        _visibleText[key] = (processed, position);
+        IsFinished = true;
+    }
+
+    public void TypeWriterUpdate(GameTime gameTime,
+        SpriteFont font,
+        string text,
+        double speed,
+        float maxWidth,
+        Vector2 position) {
         if (_index >= text.Length) {
             IsFinished = true;
             return;
@@ -38,28 +52,35 @@ public sealed class TypewriterEffect {
 
         if (_processedText == string.Empty || _index == 0) _processedText = WrapText(font, text, maxWidth);
 
+        var currentText = _visibleText.TryGetValue(JsonKeys.MainTextKey, out var value) ? value.Text : string.Empty;
         var interval = speed > 0 ? 1.0 / speed : double.MaxValue;
         _timer += gameTime.ElapsedGameTime.TotalSeconds;
         while (_timer >= interval && _index < _processedText.Length) {
-            VisibleText += _processedText[_index++];
+            currentText += _processedText[_index++];
             _timer -= interval;
+        }
+
+        _visibleText[JsonKeys.MainTextKey] = (currentText, position);
+    }
+
+    public void Draw(SpriteBatch spriteBatch, SpriteFont font) {
+        foreach (var item in _visibleText.Values) {
+            if (string.IsNullOrEmpty(item.Text)) continue;
+            spriteBatch.DrawString(
+                font, item.Text, item.Position, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f
+            );
         }
     }
 
-    public void Draw(SpriteBatch spriteBatch, SpriteFont font, Vector2 pos) {
-        if (string.IsNullOrEmpty(VisibleText)) return;
-        spriteBatch.DrawString(font, VisibleText, pos, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-    }
-
-    public void Skip(SpriteFont font, string text, float maxWidth) {
+    public void Skip(SpriteFont font, string text, float maxWidth, Vector2 position) {
         _processedText = WrapText(font, text, maxWidth);
         _index = _processedText.Length;
-        VisibleText = _processedText;
+        _visibleText[JsonKeys.MainTextKey] = (_processedText, position);
         IsFinished = true;
     }
 
     public void Reset() {
-        VisibleText = string.Empty;
+        _visibleText.Clear();
         _processedText = string.Empty;
         _index = 0;
         _timer = 0;

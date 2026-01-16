@@ -31,6 +31,7 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
         var layout = UiUtils.GetPositionByAnchor(widget.Anchor, parentBounds, widget, texture);
         if (widget is IDrawableWidget && texture != null)
             _toDraw.Add(new RenderItem { Texture = texture, Layout = layout });
+        widget.Layout = layout;
 
         if (widget.Children is not { Count: > 0 }) return;
         var bounds = new Rectangle(
