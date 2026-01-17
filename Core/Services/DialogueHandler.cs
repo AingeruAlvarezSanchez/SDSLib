@@ -103,10 +103,55 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
         _currentLineIndex++;
     }
 
-    public override void Update(FrameContext frameContext) {
-        if (!GameStatus.IsFlagActive($"{JsonKeys.Dialogues}{JsonKeys.Separator}{GameTags.IsPlaying}")) return;
-        ReadLine(frameContext.GameTime, frameContext.ActiveScreens);
+    private void HandleChoiceInput(FrameContext frameContext) {
+        if (!GameStatus.JustPressedLeftMouse) return;
+        var mousePos = Mouse.GetState()
+            .Position;
 
+        foreach (var choice in _currentNode.Choices) {
+            var nextNodeCommand = choice.FirstOrDefault(c => c.StartsWith(JsonKeys.Next + JsonKeys.Separator));
+            if (nextNodeCommand == null) continue;
+
+            var choiceCommands = choice.Where(c => c.Contains(JsonKeys.Separator))
+                .ToList();
+            var targetContainer = DataHelper.SelectBestResourceWithContext(_currentNode.Target, choiceCommands);
+            if (targetContainer == null) continue;
+
+            var parts = targetContainer.Split(JsonKeys.Separator);
+            if (!frameContext.ActiveScreens.TryGetValue(parts[1], out var choiceScreen)) return;
+            _dialogueContainer = FindWidget(choiceScreen.Widgets.Values, parts[2]);
+
+            Texture2D texture = null;
+            if (_dialogueContainer is IDrawableWidget dw && dw.Textures.Count > 0) {
+                var eligibleTextures = choiceScreen.Textures.Where(t => dw.Textures.Contains(t.Key))
+                    .ToDictionary(t => t.Key, t => t.Value);
+                texture = DataHelper.SelectBestResource(eligibleTextures);
+            }
+
+            var bounds = new Rectangle(
+                (int)_dialogueContainer.Layout.Position.X,
+                (int)_dialogueContainer.Layout.Position.Y,
+                (int)(_dialogueContainer.Layout.Scale.X * texture?.Width ?? 1),
+                (int)(_dialogueContainer.Layout.Scale.Y * texture?.Height ?? 1)
+            );
+
+            if (!bounds.Contains(mousePos)) continue;
+            _currentNode = _currentDialogue.Nodes[nextNodeCommand.Split(JsonKeys.Separator)[1]];
+            _currentLineIndex = 0;
+            GameStatus.UnSetFlag(GameTags.IsChoice);
+            GameStatus.SetFlag($"{JsonKeys.Dialogues}{JsonKeys.Separator}{GameTags.IsPlaying}");
+            _writer.Reset();
+        }
+    }
+
+    public override void Update(FrameContext frameContext) {
+        if (GameStatus.IsFlagActive(GameTags.IsChoice)) {
+            HandleChoiceInput(frameContext);
+        }
+
+        if (!GameStatus.IsFlagActive($"{JsonKeys.Dialogues}{JsonKeys.Separator}{GameTags.IsPlaying}")) return;
+
+        ReadLine(frameContext.GameTime, frameContext.ActiveScreens);
         if (!GameStatus.JustPressedKeyboardInputs.Contains(Keys.Space) && !GameStatus.JustPressedLeftMouse) return;
         var maxWidth = SdsLibInstance.GraphicsDevice.Viewport.Width * _dialogueContainer.Width - 40;
         if (!_writer.IsFinished && _currentNode.Lines.Count > 0) {

@@ -53,6 +53,7 @@ The engine automatically manages some flags related to scene navigation and dial
 - `{scene_id}:first_time`: Set when a scene is entered for the first time.
 - `{scene_id}:not_first_time`: Set after a scene has been visited at least once.
 - `dialogues:is_playing`: Set when a dialogue sequence is active.
+- `dialogues:is_choice`: Set when the player is presented with choices.
 
 ### Frame Context
 
@@ -303,6 +304,9 @@ structure to handle conversations and branching.
     subsequent elements can be commands or parameters (e.g., `["Text", "command:value"]`).
   - **`choices`**: (Optional) A list of player choices. Each choice is a list of strings where the first is the
     text and one should be a `next:target` command.
+    Choices can also include context-specific tags (e.g., `button:1`) to select specific `target` widgets for each
+    choice.
+    The engine supports mouse interaction for choices by checking the bounds of the target widgets.
   - **`next`**: (Optional) The ID of the next node to jump to. If it contains a colon (e.g., `scenes:forest`), it
     jumps to another resource type.
 
