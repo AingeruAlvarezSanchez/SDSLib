@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDSLib.Core.Services;
 using SDSLib.Domain.Interfaces;
@@ -54,6 +55,12 @@ public static class UiUtils {
             Scale = new Vector2(
                 parentBounds.Width * widget.Width / scaleWidth,
                 parentBounds.Height * widget.Height / scaleHeight
+            ),
+            Bounds = new Rectangle(
+                (int)pos.X,
+                (int)pos.Y,
+                (int)(parentBounds.Width * widget.Width / scaleWidth * texture?.Width ?? 1),
+                (int)(parentBounds.Height * widget.Height / scaleHeight * texture?.Height ?? 1)
             )
         };
     }
@@ -70,8 +77,40 @@ public static class UiUtils {
         };
     }
 
+    public static string WrapText(SpriteFont font, string text, float maxWidth) {
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+        var wrappedText = new StringBuilder();
+        float currentLineLength = 0;
+        foreach (var word in text.Split(' ')) {
+            var size = font.MeasureString(word + ' ');
+            if (currentLineLength + size.X > maxWidth) {
+                wrappedText.Append('\n');
+                currentLineLength = 0;
+            }
+
+            wrappedText.Append(word + ' ');
+            currentLineLength += size.X;
+        }
+
+        return wrappedText.ToString()
+            .TrimEnd();
+    }
+
+    public static Vector2 GetCenteredTextPosition(SpriteFont font,
+        string text,
+        float maxWidth,
+        Vector2 textScale,
+        Layout containerLayout) {
+        var wrappedText = WrapText(font, text, maxWidth);
+        var textSize = font.MeasureString(wrappedText) * textScale;
+        var xPos = containerLayout.Bounds.X + containerLayout.Bounds.Width / 2f - textSize.X / 2f;
+        var yPos = containerLayout.Bounds.Y + containerLayout.Bounds.Height / 2f - textSize.Y / 2f;
+        return new Vector2(xPos, yPos);
+    }
+
     public struct Layout {
         public Vector2 Position;
         public Vector2 Scale;
+        public Rectangle Bounds;
     }
 }

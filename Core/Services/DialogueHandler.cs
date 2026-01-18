@@ -23,6 +23,12 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
     private DialogueNode _currentNode;
     private IWidget _dialogueContainer;
 
+    private float Ratio => SdsLibInstance.GraphicsDevice.Viewport.Width / 800f;
+    private Vector2 TextScale => new(Ratio, Ratio);
+
+    private float MaxWidth =>
+        (SdsLibInstance.GraphicsDevice.Viewport.Width * _dialogueContainer.Width - 40 * Ratio) / Ratio;
+
     public override int Priority => 100;
     public override string Id => nameof(DialogueHandler);
 
@@ -50,7 +56,6 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
     private void ReadLine(GameTime gameTime, Dictionary<string, Screen> activeScreens) {
         string targetContainer;
         string[] parts;
-        float maxWidth;
         if (_currentNode.Choices.Count != 0) {
             GameStatus.SetFlag(GameTags.IsChoice);
             foreach (var choice in _currentNode.Choices) {
@@ -63,10 +68,17 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
                 if (!activeScreens.TryGetValue(parts[1], out var choiceScreen)) return;
                 _dialogueContainer = FindWidget(choiceScreen.Widgets.Values, parts[2]);
                 _currentFont = DataHelper.SelectBestResource(choiceScreen.Fonts);
-                maxWidth = SdsLibInstance.GraphicsDevice.Viewport.Width * _dialogueContainer.Width - 40;
+
+                var pos = UiUtils.GetCenteredTextPosition(
+                    _currentFont, choice[0], MaxWidth, TextScale, _dialogueContainer.Layout
+                );
+
                 _writer.Update(
-                    _dialogueContainer.Id, _currentFont, choice[0], maxWidth,
-                    _dialogueContainer.Layout.Position + new Vector2(20, 20)
+                    _dialogueContainer.Id, _currentFont, choice[0], MaxWidth,
+                    new UiUtils.Layout {
+                        Position = pos,
+                        Scale = TextScale
+                    }
                 );
             }
         }
@@ -79,10 +91,12 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
 
         _dialogueContainer = lineScreen.Widgets[$"{parts[2]}"];
         _currentFont = DataHelper.SelectBestResource(lineScreen.Fonts);
-        maxWidth = SdsLibInstance.GraphicsDevice.Viewport.Width * _dialogueContainer.Width - 40;
         _writer.TypeWriterUpdate(
-            gameTime, _currentFont, _currentNode.Lines[_currentLineIndex][0], 10d, maxWidth,
-            _dialogueContainer.Layout.Position + new Vector2(20, 20)
+            gameTime, _currentFont, _currentNode.Lines[_currentLineIndex][0], 10d, MaxWidth,
+            new UiUtils.Layout {
+                Position = _dialogueContainer.Layout.Position + new Vector2(20, 20) * Ratio,
+                Scale = TextScale
+            }
         );
     }
 
@@ -145,19 +159,19 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
     }
 
     public override void Update(FrameContext frameContext) {
-        if (GameStatus.IsFlagActive(GameTags.IsChoice)) {
-            HandleChoiceInput(frameContext);
-        }
+        if (GameStatus.IsFlagActive(GameTags.IsChoice)) HandleChoiceInput(frameContext);
 
         if (!GameStatus.IsFlagActive($"{JsonKeys.Dialogues}{JsonKeys.Separator}{GameTags.IsPlaying}")) return;
 
         ReadLine(frameContext.GameTime, frameContext.ActiveScreens);
         if (!GameStatus.JustPressedKeyboardInputs.Contains(Keys.Space) && !GameStatus.JustPressedLeftMouse) return;
-        var maxWidth = SdsLibInstance.GraphicsDevice.Viewport.Width * _dialogueContainer.Width - 40;
         if (!_writer.IsFinished && _currentNode.Lines.Count > 0) {
             _writer.Skip(
-                _currentFont, _currentNode.Lines[_currentLineIndex][0], maxWidth,
-                _dialogueContainer.Layout.Position + new Vector2(20, 20)
+                _currentFont, _currentNode.Lines[_currentLineIndex][0], MaxWidth,
+                new UiUtils.Layout {
+                    Position = _dialogueContainer.Layout.Position + new Vector2(20, 20) * Ratio,
+                    Scale = TextScale
+                }
             );
         } else OnFinishedLine();
     }
