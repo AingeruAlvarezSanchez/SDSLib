@@ -127,6 +127,14 @@ public class SdsLib : Game {
 
     protected override void Update(GameTime gameTime) {
         GameStatus.UpdateInputs();
+
+        var changeScene = GameStatus.GetFlagByPrefix($"{GameTags.ChangeStatus}{JsonKeys.Separator}");
+        if (changeScene != null) {
+            var sceneId = changeScene.Split(JsonKeys.Separator);
+            GameStatus.UnSetFlag($"{changeScene}");
+            _stateManager.ChangeState(new NarrativeState(sceneId[2]));
+        }
+
         _stateManager.Update(gameTime);
         base.Update(gameTime);
     }

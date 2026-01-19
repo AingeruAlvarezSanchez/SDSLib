@@ -4,5 +4,6 @@ public static class GameTags {
     public const string FirstTime = "first_time",
         NotFirstTime = "not_first_time",
         IsPlaying = "is_playing",
-        IsChoice = "is:choice";
+        IsChoice = "is_choice",
+        ChangeStatus = "change";
 }

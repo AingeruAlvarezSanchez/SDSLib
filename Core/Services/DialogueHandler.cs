@@ -105,6 +105,8 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
         if (_currentLineIndex == _currentNode.Lines.Count - 1) {
             switch (_currentNode.Next) {
                 case null or "": Exit(); break;
+                case var next when next.StartsWith(JsonKeys.Scenes + JsonKeys.Separator):
+                    GameStatus.SetFlag($"{GameTags.ChangeStatus}{JsonKeys.Separator}{next}"); break;
                 default:
                     _currentLineIndex = 0;
                     _currentNode = _currentDialogue.Nodes[_currentNode.Next];

@@ -24,6 +24,10 @@ public static class GameStatus {
         _currentMouse = Mouse.GetState();
     }
 
+    public static string GetFlagByPrefix(string prefix) {
+        return ActiveFlags.FirstOrDefault(f => f.StartsWith(prefix));
+    }
+
     public static bool IsFlagActive(string flag) {
         return ActiveFlags.Contains(flag);
     }
