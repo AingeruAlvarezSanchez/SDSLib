@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using SDSLib.Core.Constants;
 using SDSLib.Core.Services;
+using SDSLib.Core.Utils;
 using SDSLib.Domain.Interfaces;
 using SDSLib.Domain.Scenes;
 using SDSLib.Domain.UI.Screen;
@@ -14,8 +15,10 @@ using SDSLib.Resources.Constants;
 namespace SDSLib.Core.States;
 
 public abstract class AGameState : IGameState {
-    protected List<IGameHandler> _handlers;
+    protected List<IGameHandler> Handlers;
     protected virtual Scene CurrentScene { get; set; }
+    protected virtual string CurrentSong { get; set; }
+
     protected virtual Dictionary<string, Screen> ActiveScreens { get; } = new();
     public FrameContext FrameContext { get; set; } = new();
 
@@ -23,21 +26,21 @@ public abstract class AGameState : IGameState {
         if (CurrentScene == null) return;
         if (!GameStatus.IsFlagActive($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.NotFirstTime}"))
             GameStatus.SetFlag($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.FirstTime}");
-        _handlers = RegisterResourceHandlers(sdsInstance)
+        Handlers = RegisterResourceHandlers(sdsInstance)
             .OrderBy(h => h.Priority)
             .ToList();
-        foreach (var handler in _handlers) handler.Enter(CurrentScene);
+        foreach (var handler in Handlers) handler.Enter(CurrentScene);
     }
 
     public virtual void Update(GameTime gameTime) {
         FrameContext.GameTime = gameTime;
         FrameContext.CurrentScene = CurrentScene;
         FrameContext.ActiveScreens = ActiveScreens;
-        foreach (var handler in _handlers) handler.Update(FrameContext);
+        foreach (var handler in Handlers) handler.Update(FrameContext);
     }
 
     public virtual void Draw(GameTime gameTime, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch) {
-        foreach (var handler in _handlers) handler.Draw(spriteBatch);
+        foreach (var handler in Handlers) handler.Draw(spriteBatch);
     }
 
     public virtual void Exit() {
@@ -46,9 +49,21 @@ public abstract class AGameState : IGameState {
         GameStatus.SetFlag($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.NotFirstTime}");
         GameStatus.UnSetFlag($"{CurrentScene.Id}{JsonKeys.Separator}{GameTags.FirstTime}");
         CurrentScene = null;
-        foreach (var handler in _handlers) handler.Exit();
+        foreach (var handler in Handlers) handler.Exit();
 
-        _handlers = null;
+        Handlers = null;
+    }
+
+
+    protected void PlayBestSong() {
+        var song = DataHelper.SelectBestResource(CurrentScene.Sounds);
+        if (CurrentSong != null && CurrentSong.Equals(song.Name)) return;
+
+        if (MediaPlayer.State != MediaState.Stopped) MediaPlayer.Stop();
+        if (song == null) return;
+
+        MediaPlayer.Play(song);
+        CurrentSong = song.Name;
     }
 
 

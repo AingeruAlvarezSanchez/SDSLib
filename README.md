@@ -23,16 +23,25 @@ SDSLib uses a **State Pattern** to manage different game phases (e.g., Main Menu
 
 #### Game States (`IGameState`)
 
-All states must implement the `IGameState` interface or inherit from `AGameState`:
+All states must implement the `IGameState` interface or inherit from `AGameState`. The base class provides the following
+lifecycle methods:
 
 - **`Enter(SdsLib instance)`**: Called when the state becomes active.
 - **`Update(GameTime gameTime)`**: Logic update loop.
 - **`Draw(GameTime gameTime, ...)`**: Rendering loop.
 - **`Exit()`**: Cleanup before switching to a new state.
 
+#### Built-in States
+
+- **`NarrativeState`**: Used for dialogue and narration-heavy sections.
+- **`MenuState`**: A specialized state for main menus, supporting scene loading and background music.
+- **`AGameState`**: The base class for all states, providing shared functionality for scene management and audio
+  playback.
+
 #### StateManager
 
-The `StateManager` handles the transitions between states.
+The `StateManager` handles the transitions between states. Transitions can be triggered manually or via game flags (see
+Persistence & Game Status).
 
 ### Persistence & Game Status
 
@@ -48,12 +57,14 @@ engine to track progress and can be used by developers to handle conditional log
 
 #### Automatic Flags
 
-The engine automatically manages some flags related to scene navigation and dialogue state:
+The engine automatically manages some flags related to scene navigation, dialogue state, and state transitions:
 
 - `{scene_id}:first_time`: Set when a scene is entered for the first time.
 - `{scene_id}:not_first_time`: Set after a scene has been visited at least once.
 - `dialogues:is_playing`: Set when a dialogue sequence is active.
 - `dialogues:is_choice`: Set when the player is presented with choices.
+- `change:scenes:{scene_id}`: If this flag is set, the engine will automatically transition to a new `NarrativeState`
+  with the specified scene.
 
 ### Frame Context
 

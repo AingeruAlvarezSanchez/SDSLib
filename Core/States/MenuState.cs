@@ -9,7 +9,7 @@ using SDSLib.Resources.Constants;
 
 namespace SDSLib.Core.States;
 
-public sealed class NarrativeState(string sceneId) : AGameState {
+public sealed class MenuState(string sceneId) : AGameState {
     protected override Scene CurrentScene { get; set; }
     protected override string CurrentSong { get; set; }
 
