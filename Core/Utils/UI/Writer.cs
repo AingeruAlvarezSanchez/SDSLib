@@ -6,7 +6,7 @@ using SDSLib.Resources.Constants;
 namespace SDSLib.Core.Utils.UI;
 
 public sealed class Writer {
-    private readonly Dictionary<string, (string Text, UiUtils.Layout Layout)> _visibleText = new();
+    private readonly Dictionary<string, (string Text, UiUtils.Layout Layout, SpriteFont font)> _visibleText = new();
     private int _index;
     private string _processedText = string.Empty;
     private double _timer;
@@ -15,7 +15,7 @@ public sealed class Writer {
 
     public void Update(string key, SpriteFont font, string text, float maxWidth, UiUtils.Layout layout) {
         var processed = UiUtils.WrapText(font, text, maxWidth);
-        _visibleText[key] = (processed, layout);
+        _visibleText[key] = (processed, layout, font);
         IsFinished = true;
     }
 
@@ -40,14 +40,14 @@ public sealed class Writer {
             _timer -= interval;
         }
 
-        _visibleText[JsonKeys.MainTextKey] = (currentText, layout);
+        _visibleText[JsonKeys.MainTextKey] = (currentText, layout, font);
     }
 
-    public void Draw(SpriteBatch spriteBatch, SpriteFont font) {
+    public void Draw(SpriteBatch spriteBatch) {
         foreach (var item in _visibleText.Values) {
             if (string.IsNullOrEmpty(item.Text)) continue;
             spriteBatch.DrawString(
-                font, item.Text, item.Layout.Position, Color.White, 0f, Vector2.Zero, item.Layout.Scale,
+                item.font, item.Text, item.Layout.Position, Color.White, 0f, Vector2.Zero, item.Layout.Scale,
                 SpriteEffects.None, 0f
             );
         }
@@ -56,7 +56,7 @@ public sealed class Writer {
     public void Skip(SpriteFont font, string text, float maxWidth, UiUtils.Layout layout) {
         _processedText = UiUtils.WrapText(font, text, maxWidth);
         _index = _processedText.Length;
-        _visibleText[JsonKeys.MainTextKey] = (_processedText, layout);
+        _visibleText[JsonKeys.MainTextKey] = (_processedText, layout, font);
         IsFinished = true;
     }
 

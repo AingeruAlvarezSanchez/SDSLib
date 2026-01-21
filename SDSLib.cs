@@ -132,7 +132,12 @@ public class SdsLib : Game {
         if (changeScene != null) {
             var sceneId = changeScene.Split(JsonKeys.Separator);
             GameStatus.UnSetFlag($"{changeScene}");
-            _stateManager.ChangeState(new NarrativeState(sceneId[2]));
+            if (sceneId.Length < 3) return;
+
+            switch (sceneId[1]) {
+                case JsonKeys.Scenes: _stateManager.ChangeState(new NarrativeState(sceneId[2])); break;
+                case JsonKeys.Menus: _stateManager.ChangeState(new MenuState(sceneId[2])); break;
+            }
         }
 
         _stateManager.Update(gameTime);

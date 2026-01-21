@@ -14,6 +14,7 @@ namespace SDSLib.Core.Services;
 
 public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibInstance) {
     private readonly List<RenderItem> _toDraw = [];
+    private readonly Writer _writer = new();
     public override int Priority => 50;
     public override string Id => nameof(ScreenHandler);
     public Dictionary<string, Screen> ActiveScreens { get; } = new();
@@ -32,6 +33,29 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
         if (widget is IDrawableWidget && texture != null)
             _toDraw.Add(new RenderItem { Texture = texture, Layout = layout });
         widget.Layout = layout;
+
+        if (widget is Button button && !string.IsNullOrWhiteSpace(button.Text)) {
+            var availableFonts = screen.Fonts
+                .Where(f => button.Fonts.Contains(f.Key))
+                .ToDictionary(f => f.Key, f => f.Value);
+
+            var font = DataHelper.SelectBestResource(availableFonts);
+
+            if (font != null) {
+                var ratio = SdsLibInstance.GraphicsDevice.Viewport.Width / 800f;
+                Vector2 textScale = new(ratio, ratio);
+                var maxWidth = button.Layout.Bounds.Width / ratio;
+                var centeredPos = UiUtils.GetCenteredTextPosition(
+                    font, button.Text, maxWidth, textScale, button.Layout
+                );
+                _writer.Update(
+                    button.Id, font, button.Text, maxWidth, new UiUtils.Layout {
+                        Position = centeredPos,
+                        Scale = textScale
+                    }
+                );
+            }
+        }
 
         if (widget.Children is not { Count: > 0 }) return;
         var bounds = new Rectangle(
@@ -58,9 +82,9 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
                 ProcessWidget(child, bounds, screen);
                 pos += (int)(bounds.Height * child.Height) + spacing;
             }
-        } else {
-            foreach (var child in widget.Children) ProcessWidget(child, bounds, screen);
-        }
+        } else
+            foreach (var child in widget.Children)
+                ProcessWidget(child, bounds, screen);
     }
 
     private void RefreshLayout(Scene currentScene) {
@@ -80,7 +104,6 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
     public override void Update(FrameContext frameContext) {
         if (!GameStatus.VersionChanged) return;
         RefreshLayout(frameContext.CurrentScene);
-        GameStatus.ResetVersionFlag();
     }
 
     public override void Draw(SpriteBatch spriteBatch) {
@@ -90,6 +113,8 @@ public sealed class ScreenHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLibIn
                 SpriteEffects.None, 0f
             );
         }
+
+        _writer.Draw(spriteBatch);
     }
 
     public override void Exit() {

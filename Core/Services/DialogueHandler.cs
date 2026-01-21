@@ -179,7 +179,7 @@ public sealed class DialogueHandler(SdsLib sdsLibInstance) : AGameHandler(sdsLib
     }
 
     public override void Draw(SpriteBatch spriteBatch) {
-        _writer.Draw(spriteBatch, _currentFont);
+        _writer.Draw(spriteBatch);
     }
 
 

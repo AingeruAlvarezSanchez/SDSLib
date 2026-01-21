@@ -65,6 +65,8 @@ The engine automatically manages some flags related to scene navigation, dialogu
 - `dialogues:is_choice`: Set when the player is presented with choices.
 - `change:scenes:{scene_id}`: If this flag is set, the engine will automatically transition to a new `NarrativeState`
   with the specified scene.
+- `change:menus:{menu_id}`: If this flag is set, the engine will automatically transition to a new `MenuState`
+  with the specified menu scene.
 
 ### Frame Context
 
@@ -90,6 +92,12 @@ Handlers follow a lifecycle similar to states:
 - **`Update(FrameContext context)`**: Logic update.
 - **`Draw(SpriteBatch spriteBatch)`**: Rendering.
 - **`Exit()`**: Cleanup.
+
+#### Built-in Handlers
+
+- **`ScreenHandler`**: Manages UI layout, rendering of textures, and centering of button texts.
+- **`ButtonHandler`**: Handles mouse interaction for buttons and executes their associated actions.
+- **`DialogueHandler`**: Manages the progression of conversations and the typewriter effect.
 
 #### Automatic Registration
 

@@ -47,5 +47,6 @@ public static class JsonKeys {
         BottomCenter = "bottom:center",
         BottomRight = "bottom:right",
         BottomLeft = "bottom:left",
-        MainTextKey = "main";
+        MainTextKey = "main",
+        Menus = "menus";
 }
